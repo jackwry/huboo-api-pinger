@@ -17,10 +17,7 @@ interface CatFact {
 }
 
 export const createCatFactRequester =
-  (options: {
-    catFactsUrl: string;
-    onFailedRequest?: () => void;
-  }): (() => Promise<CatFact>) =>
+  (options: { catFactsUrl: string }): (() => Promise<CatFact>) =>
   async () => {
     const response = await axios.get<CatFact>(options.catFactsUrl);
 

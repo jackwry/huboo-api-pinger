@@ -1,8 +1,13 @@
-import axios from "axios";
 import logger from "./logger";
 
-export const createCatFactsPoller = (options: {
+/**
+ * Creates an instance of a poller which is a wrapper around setTimeout
+ * @param options Configuration for the poller
+ * @returns A poller which can be started and stopped
+ */
+export const createPoller = (options: {
   interval: number;
+  action: () => Promise<void>;
   maxRequests?: number;
 }) => {
   let interval: NodeJS.Timer | undefined;
@@ -19,11 +24,14 @@ export const createCatFactsPoller = (options: {
   };
 
   const start = () => {
-    interval = setInterval(() => {
-      logger.info("Polling new cat fact...");
+    interval = setInterval(async () => {
+      logger.info("Running new action...");
+      await options.action();
+
       totalRequests++;
 
       if (options.maxRequests && totalRequests >= options.maxRequests) {
+        logger.info("Maximum requests reached... stopping poller");
         stop();
       }
     }, options.interval);
